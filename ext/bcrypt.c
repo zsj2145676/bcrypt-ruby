@@ -158,9 +158,6 @@ encode_salt(char *salt, u_int8_t *csalt, u_int16_t clen, u_int8_t logr)
 char *
 bcrypt_gensalt(u_int8_t log_rounds, u_int8_t *rseed)
 {
-	u_int16_t i;
-	u_int32_t seed = 0;
-
 	if (log_rounds < 4)
 		log_rounds = 4;
 	else if (log_rounds > 31)
