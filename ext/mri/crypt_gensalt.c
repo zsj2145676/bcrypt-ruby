@@ -10,9 +10,6 @@
 #include <string.h>
 
 #include <errno.h>
-#ifndef __set_errno
-#define __set_errno(val) errno = (val)
-#endif
 
 #undef __CONST
 #ifdef __GNUC__
@@ -29,7 +26,6 @@ char *_crypt_gensalt_traditional_rn(unsigned long count,
 {
 	if (size < 2 || output_size < 2 + 1 || (count && count != 25)) {
 		if (output_size > 0) output[0] = '\0';
-		__set_errno((output_size < 2 + 1) ? ERANGE : EINVAL);
 		return NULL;
 	}
 
@@ -50,7 +46,6 @@ char *_crypt_gensalt_extended_rn(unsigned long count,
 	if (size < 3 || output_size < 1 + 4 + 4 + 1 ||
 	    (count && (count > 0xffffff || !(count & 1)))) {
 		if (output_size > 0) output[0] = '\0';
-		__set_errno((output_size < 1 + 4 + 4 + 1) ? ERANGE : EINVAL);
 		return NULL;
 	}
 
@@ -80,7 +75,6 @@ char *_crypt_gensalt_md5_rn(unsigned long count,
 
 	if (size < 3 || output_size < 3 + 4 + 1 || (count && count != 1000)) {
 		if (output_size > 0) output[0] = '\0';
-		__set_errno((output_size < 3 + 4 + 1) ? ERANGE : EINVAL);
 		return NULL;
 	}
 

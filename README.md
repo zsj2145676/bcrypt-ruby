@@ -5,8 +5,6 @@ An easy way to keep your users' passwords secure.
 * http://bcrypt-ruby.rubyforge.org/
 * http://github.com/codahale/bcrypt-ruby/tree/master
 
-[![Build Status](https://travis-ci.org/codahale/bcrypt-ruby.png?branch=master)](https://travis-ci.org/codahale/bcrypt-ruby)
-
 ## Why you should use `bcrypt()`
 
 If you store user passwords in the clear, then an attacker who steals a copy of your database has a giant list of emails
@@ -26,7 +24,7 @@ re-hash those passwords. This vulernability only affected the JRuby gem.
 
 ## How to install bcrypt
 
-    gem install bcrypt-ruby
+    sudo gem install bcrypt-ruby
 
 The bcrypt-ruby gem is available on the following ruby platforms:
 
@@ -35,10 +33,6 @@ The bcrypt-ruby gem is available on the following ruby platforms:
 * Any 1.8 or 1.9 ruby on a BSD/OSX/Linux system with a compiler
 
 ## How to use `bcrypt()` in your Rails application
-
-*Note*: Rails versions >= 3 ship with `ActiveModel::SecurePassword` which uses bcrypt-ruby.
-`has_secure_password` [docs](http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password) 
-implements a similar authentication strategy to the code below.
 
 ### The _User_ model
 
@@ -170,20 +164,6 @@ passwords will still work fine, but new passwords can keep up with the times.
 The default cost factor used by bcrypt-ruby is 10, which is fine for session-based authentication. If you are using a
 stateless authentication architecture (e.g., HTTP Basic Auth), you will want to lower the cost factor to reduce your
 server load and keep your request times down. This will lower the security provided you, but there are few alternatives.
-
-To change the default cost factor used by bcrypt-ruby, use `BCrypt::Engine.cost = new_value`:
-
-    BCrypt::Password.create('secret').cost
-      #=> 10, the default provided by bcrypt-ruby
-
-    # set a new default cost
-    BCrypt::Engine.cost = 8
-    BCrypt::Password.create('secret').cost
-      #=> 8
-
-The default cost can be overridden as needed by passing an options hash with a different cost:
-
-    BCrypt::Password.create('secret', :cost => 6).cost  #=> 6
 
 ## More Information
 

@@ -7,9 +7,6 @@
 #include <string.h>
 
 #include <errno.h>
-#ifndef __set_errno
-#define __set_errno(val) errno = (val)
-#endif
 
 #ifdef TEST
 #include <stdio.h>
@@ -21,13 +18,6 @@
 #ifdef TEST_THREADS
 #include <pthread.h>
 #endif
-#endif
-
-#include <ruby.h>
-#ifdef HAVE_RUBY_UTIL_H
-#include <ruby/util.h>
-#else
-#include <util.h>
 #endif
 
 #define CRYPT_OUTPUT_SIZE		(7 + 22 + 31 + 1)
@@ -74,7 +64,6 @@ static int _crypt_data_alloc(void **data, int *size, int need)
 	if (!updated) {
 #ifndef __GLIBC__
 		/* realloc(3) on glibc sets errno, so we don't need to bother */
-		__set_errno(ENOMEM);
 #endif
 		return -1;
 	}
@@ -126,12 +115,10 @@ char *__crypt_rn(__const char *key, __const char *setting,
 	if (setting[0] == '$' && setting[1] == '1')
 		return __md5_crypt_r(key, setting, (char *)data, size);
 	if (setting[0] == '$' || setting[0] == '_') {
-		__set_errno(EINVAL);
 		return NULL;
 	}
 	if (size >= sizeof(struct crypt_data))
 		return __des_crypt_r(key, setting, (struct crypt_data *)data);
-	__set_errno(ERANGE);
 	return NULL;
 }
 
@@ -149,7 +136,6 @@ char *__crypt_ra(__const char *key, __const char *setting,
 		return __md5_crypt_r(key, setting, (char *)*data, *size);
 	}
 	if (setting[0] == '$' || setting[0] == '_') {
-		__set_errno(EINVAL);
 		return NULL;
 	}
 	if (_crypt_data_alloc(data, size, sizeof(struct crypt_data)))
@@ -205,7 +191,6 @@ char *__crypt_gensalt_rn(__CONST char *prefix, unsigned long count,
 
 	/* This may be supported on some platforms in the future */
 	if (!input) {
-		__set_errno(EINVAL);
 		return NULL;
 	}
 
@@ -224,7 +209,6 @@ char *__crypt_gensalt_rn(__CONST char *prefix, unsigned long count,
 	    memchr(_crypt_itoa64, prefix[1], 64)))
 		use = _crypt_gensalt_traditional_rn;
 	else {
-		__set_errno(EINVAL);
 		return NULL;
 	}
 
@@ -241,11 +225,10 @@ char *__crypt_gensalt_ra(__CONST char *prefix, unsigned long count,
 		input, size, output, sizeof(output));
 
 	if (retval) {
-		retval = ruby_strdup(retval);
+		retval = strdup(retval);
 #ifndef __GLIBC__
 		/* strdup(3) on glibc sets errno, so we don't need to bother */
 		if (!retval)
-			__set_errno(ENOMEM);
 #endif
 	}
 

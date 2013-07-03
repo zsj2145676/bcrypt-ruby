@@ -34,44 +34,6 @@ describe "Reading a hashed password" do
     @hash = "$2a$05$CCCCCCCCCCCCCCCCCCCCC.E5YPO9kmyuRGyh0XouQYb4YMJKvyOeW"
   end
 
-  specify "the cost is too damn high" do
-    lambda {
-      BCrypt::Password.create("hello", :cost => 32)
-    }.should raise_error(ArgumentError)
-  end
-
-  specify "the cost should be set to the default if nil" do
-    BCrypt::Password.create("hello", :cost => nil).cost.should equal(BCrypt::Engine::DEFAULT_COST)
-  end
-
-  specify "the cost should be set to the default if empty hash" do
-    BCrypt::Password.create("hello", {}).cost.should equal(BCrypt::Engine::DEFAULT_COST)
-  end
-
-  specify "the cost should be set to the passed value if provided" do
-    BCrypt::Password.create("hello", :cost => 5).cost.should equal(5)
-  end
-
-  specify "the cost should be set to the global value if set" do
-    BCrypt::Engine.cost = 5
-    BCrypt::Password.create("hello").cost.should equal(5)
-    # unset the global value to not affect other tests
-    BCrypt::Engine.cost = nil
-  end
-
-  specify "the cost should be set to an overridden constant for backwards compatibility" do
-    # suppress "already initialized constant" warning
-    old_verbose, $VERBOSE = $VERBOSE, nil
-    old_default_cost = BCrypt::Engine::DEFAULT_COST
-
-    BCrypt::Engine::DEFAULT_COST = 5
-    BCrypt::Password.create("hello").cost.should equal(5)
-
-    # reset default to not affect other tests
-    BCrypt::Engine::DEFAULT_COST = old_default_cost
-    $VERBOSE = old_verbose
-  end
-
   specify "should read the version, cost, salt, and hash" do
     password = BCrypt::Password.new(@hash)
     password.version.should eql("2a")
@@ -110,14 +72,5 @@ describe "Validating a generated salt" do
   end
   specify "should accept a valid salt" do
     BCrypt::Engine.valid_salt?(BCrypt::Engine.generate_salt).should eq(true)
-  end
-end
-
-describe "Validating a password hash" do
-  specify "should not accept an invalid password" do
-    BCrypt::Password.valid_hash?("i_am_so_not_valid").should be_false
-  end
-  specify "should accept a valid password" do
-    BCrypt::Password.valid_hash?(BCrypt::Password.create "i_am_so_valid").should be_true
   end
 end
